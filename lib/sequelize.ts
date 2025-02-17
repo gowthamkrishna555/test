@@ -14,7 +14,7 @@ const sequelize = new Sequelize(
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync(); // Sync all models with database
+    await sequelize.sync(); 
     console.log(" PostgreSQL connected successfully!");
   } catch (error) {
     console.error(" PostgreSQL connection failed:", error);
@@ -22,6 +22,6 @@ export const connectDB = async () => {
   }
 };
 
-connectDB(); // Automatically connects to DB when this file is imported
+connectDB(); 
 
-export { sequelize }; // Exporting the sequelize instance
+export { sequelize }; 

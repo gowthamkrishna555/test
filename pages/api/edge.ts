@@ -3,14 +3,14 @@ import Edge from "../../models/Edge";
 import Node from "../../models/Node";
 import { connectDB } from "../../lib/sequelize";
 
-// API handler for edge creation and fetching
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   await connectDB();
 
   if (req.method === "GET") {
     try {
       const edges = await Edge.findAll();
-      console.log("Fetched edges:", edges); // Log the fetched edges for debugging
+      console.log("Fetched edges:", edges); 
       return res.status(200).json(edges);
     } catch (error) {
       console.error("Error fetching edges:", error);
@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   
     try {
-      // Ensure the source and target nodes exist
+      
       const sourceNode = await Node.findByPk(source);
       const targetNode = await Node.findByPk(target);
   
@@ -35,13 +35,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "Source or Target node does not exist" });
       }
   
-      // Check if the edge already exists
+      
       const existingEdge = await Edge.findOne({ where: { source, target } });
       if (existingEdge) {
         return res.status(409).json({ error: "Edge already exists between the source and target nodes" });
       }
   
-      // Create the new edge without needing the id in the request
+      
       const newEdge = await Edge.create({ source, target });
       console.log("Created new edge:", newEdge);  // Log the created edge for debugging
       return res.status(201).json(newEdge);

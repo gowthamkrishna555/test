@@ -34,14 +34,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "Node ID is required" });
       }
 
-      // Find the existing node
+      
       const existingNode = await Node.findOne({ where: { id } });
 
       if (!existingNode) {
         return res.status(404).json({ error: "Node not found" });
       }
 
-      // Update the node with the new data
+      
       const updatedNode = await existingNode.update({
         label: label || existingNode.label,
         position_x: position_x || existingNode.position_x,
@@ -63,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       console.log(`Deleting node with ID: ${id}`);
 
-      // Check if the node exists first
+      
       const node = await Node.findOne({ where: { id } });
 
       if (!node) {

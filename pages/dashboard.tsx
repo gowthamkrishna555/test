@@ -11,7 +11,7 @@ import { Box, Button, Container, Paper, Typography, TextField } from "@mui/mater
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
 
-// Define CustomEdge interface extending Edge
+
 interface CustomEdge {
   id: string;
   source: string;
@@ -24,7 +24,7 @@ export default function Dashboard() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [nodeLabel, setNodeLabel] = useState<string>("");
 
-  // Fetch nodes and edges from the API (for data persistence across refreshes)
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -33,7 +33,7 @@ export default function Dashboard() {
           axios.get<any[]>("/api/edge"),
         ]);
 
-        // Set nodes and edges state from the API response
+        
         setNodes(
           nodeRes.data.map((node: any) => ({
             id: node.id.toString(),
@@ -58,9 +58,7 @@ export default function Dashboard() {
   }, []);  
 
   const addNode = async () => {
-    if (!selectedNodeId) return;
-
-    // Create a new node with unique ID
+    
     const newNode = {
       id: uuidv4(),
       label: `Node ${nodes.length + 1}`,
@@ -69,45 +67,65 @@ export default function Dashboard() {
       color: "#1976d2",
     };
 
-    // Find the selected parent node
-    const parentNode = nodes.find((node) => node.id === selectedNodeId);
+    if (selectedNodeId) {
+      
+      const parentNode = nodes.find((node) => node.id === selectedNodeId);
 
-    if (parentNode) {
-      const newPositionY = parentNode.position.y + 100;
+      if (parentNode) {
+        const newPositionY = parentNode.position.y + 100;
 
+        setNodes((prev) => [
+          ...prev,
+          {
+            id: newNode.id,
+            data: { label: newNode.label },
+            position: { x: parentNode.position.x + 200, y: newPositionY },
+            style: { backgroundColor: newNode.color, borderRadius: "5px", padding: "10px" },
+          },
+        ]);
+
+        setEdges((prev) => [
+          ...prev,
+          {
+            id: `${selectedNodeId}-${newNode.id}`,
+            source: selectedNodeId,
+            target: newNode.id,
+          },
+        ]);
+
+        
+        try {
+          await axios.post("/api/node", newNode);
+          await axios.post("/api/edge", {
+            source: selectedNodeId,
+            target: newNode.id,
+          });
+        } catch (error) {
+          console.error("Error adding node:", error);
+        }
+      }
+    } else {
+      // Add the node 
       setNodes((prev) => [
         ...prev,
         {
           id: newNode.id,
           data: { label: newNode.label },
-          position: { x: parentNode.position.x + 200, y: newPositionY },
+          position: { x: newNode.position_x, y: newNode.position_y },
           style: { backgroundColor: newNode.color, borderRadius: "5px", padding: "10px" },
         },
       ]);
 
-      setEdges((prev) => [
-        ...prev,
-        {
-          id: `${selectedNodeId}-${newNode.id}`,
-          source: selectedNodeId,
-          target: newNode.id,
-        },
-      ]);
-
-      // Persist the new node and edge to the database
+      
       try {
         await axios.post("/api/node", newNode);
-        await axios.post("/api/edge", {
-          source: selectedNodeId,
-          target: newNode.id,
-        });
       } catch (error) {
         console.error("Error adding node:", error);
       }
     }
   };
 
-  // Delete node (with persistence)
+  // Delete node 
   const deleteNode = async (id: string) => {
     setNodes((prev) => prev.filter((node) => node.id !== id));
     setEdges((prev) => prev.filter((edge) => edge.source !== id && edge.target !== id));
@@ -162,9 +180,8 @@ export default function Dashboard() {
           variant="contained"
           onClick={addNode}
           sx={{ backgroundColor: "#1976d2" }}
-          disabled={!selectedNodeId} // Disable Add Node if no node is selected
         >
-          Add Node (as Child)
+          Add Node (as Root or Child)
         </Button>
       </Box>
 
