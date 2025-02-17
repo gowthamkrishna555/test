@@ -9,13 +9,13 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { Box, Button, Container, Paper, Typography, TextField } from "@mui/material";
 import axios from "axios";
+import { v4 as uuidv4 } from 'uuid';
 
 // Define CustomEdge interface extending Edge
 interface CustomEdge {
   id: string;
   source: string;
   target: string;
-  
 }
 
 export default function Dashboard() {
@@ -48,7 +48,6 @@ export default function Dashboard() {
             id: edge.id.toString(),
             source: edge.source.toString(),
             target: edge.target.toString(),
-            
           }))
         );
       } catch (error) {
@@ -58,18 +57,19 @@ export default function Dashboard() {
     fetchData();
   }, []);  
 
-  
   const addNode = async () => {
     if (!selectedNodeId) return;
 
+    // Create a new node with unique ID
     const newNode = {
-      id: `${nodes.length + 1}`,
-      label: `Child Node ${nodes.length + 1}`,
+      id: uuidv4(),
+      label: `Node ${nodes.length + 1}`,
       position_x: 250,
       position_y: nodes.length * 100 + 50,
       color: "#1976d2",
     };
 
+    // Find the selected parent node
     const parentNode = nodes.find((node) => node.id === selectedNodeId);
 
     if (parentNode) {
@@ -91,7 +91,6 @@ export default function Dashboard() {
           id: `${selectedNodeId}-${newNode.id}`,
           source: selectedNodeId,
           target: newNode.id,
-          
         },
       ]);
 
@@ -101,7 +100,6 @@ export default function Dashboard() {
         await axios.post("/api/edge", {
           source: selectedNodeId,
           target: newNode.id,
-          
         });
       } catch (error) {
         console.error("Error adding node:", error);
@@ -166,7 +164,7 @@ export default function Dashboard() {
           sx={{ backgroundColor: "#1976d2" }}
           disabled={!selectedNodeId} // Disable Add Node if no node is selected
         >
-          Add Child Node
+          Add Node (as Child)
         </Button>
       </Box>
 

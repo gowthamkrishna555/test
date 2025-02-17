@@ -12,6 +12,7 @@ Edge.init(
   {
     id: {
       type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
       allowNull: false,
     },
@@ -28,10 +29,10 @@ Edge.init(
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: Node,  // Reference the Node model
-        key: 'id',    // 'id' field in the Node model
+        model: Node,  
+        key: 'id',    
       },
-      onDelete: 'CASCADE', // Optional: delete edges when the associated node is deleted
+      onDelete: 'CASCADE', 
     },
   },
   {
@@ -42,7 +43,7 @@ Edge.init(
   }
 );
 
-// Ensure relationships are set up in Sequelize
+
 Edge.belongsTo(Node, { foreignKey: 'source', as: 'SourceNode' });
 Edge.belongsTo(Node, { foreignKey: 'target', as: 'TargetNode' });
 

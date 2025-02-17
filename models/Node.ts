@@ -35,7 +35,7 @@ Node.init(
   },
   {
     sequelize,
-    tableName: "Node", // âœ… Ensure it matches your database table
+    tableName: "Node", //  Ensure it matches your database table
     freezeTableName: true, // Prevent Sequelize from pluralizing
     timestamps: false, 
   }
