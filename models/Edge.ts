@@ -16,7 +16,7 @@ Edge.init(
       allowNull: false,
     },
     source: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: Node,  
@@ -25,7 +25,7 @@ Edge.init(
       onDelete: 'CASCADE', 
     },
     target: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: Node,  // Reference the Node model
@@ -37,7 +37,7 @@ Edge.init(
   {
     sequelize,
     tableName: "Edge", 
-    freezeTableName: true,
+    
     timestamps: false, 
   }
 );

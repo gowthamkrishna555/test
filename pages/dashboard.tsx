@@ -15,7 +15,7 @@ interface CustomEdge {
   id: string;
   source: string;
   target: string;
-  customLabel?: string;
+  
 }
 
 export default function Dashboard() {
@@ -48,7 +48,7 @@ export default function Dashboard() {
             id: edge.id.toString(),
             source: edge.source.toString(),
             target: edge.target.toString(),
-            customLabel: edge.customLabel || "Custom Label",
+            
           }))
         );
       } catch (error) {
@@ -91,7 +91,7 @@ export default function Dashboard() {
           id: `${selectedNodeId}-${newNode.id}`,
           source: selectedNodeId,
           target: newNode.id,
-          customLabel: "Child Node Link",
+          
         },
       ]);
 
@@ -101,7 +101,7 @@ export default function Dashboard() {
         await axios.post("/api/edge", {
           source: selectedNodeId,
           target: newNode.id,
-          customLabel: "Child Node Link",
+          
         });
       } catch (error) {
         console.error("Error adding node:", error);
