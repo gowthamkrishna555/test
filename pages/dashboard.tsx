@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import ReactFlow, {
   Background,
@@ -40,7 +38,7 @@ export default function Dashboard() {
           nodeRes.data.map((node: any) => ({
             id: node.id.toString(),
             data: { label: node.label },
-            position: { x: node.positionX, y: node.positionY },
+            position: { x: node.position_x, y: node.position_y },
             style: { backgroundColor: node.color || "#ddd", borderRadius: "5px", padding: "10px" },
           }))
         );
@@ -58,9 +56,9 @@ export default function Dashboard() {
       }
     };
     fetchData();
-  }, []);
+  }, []);  
 
-  // Add new node (with persistence)
+  
   const addNode = async () => {
     if (!selectedNodeId) return;
 

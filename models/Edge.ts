@@ -1,6 +1,6 @@
 import { Model, DataTypes } from "sequelize";
-import { sequelize } from '../lib/sequelize'; 
-
+import { sequelize } from '../lib/sequelize';
+import Node from './Node';  
 
 class Edge extends Model {
   public id!: string;
@@ -18,10 +18,20 @@ Edge.init(
     source: {
       type: DataTypes.STRING,
       allowNull: false,
+      references: {
+        model: Node,  
+        key: 'id',    
+      },
+      onDelete: 'CASCADE', 
     },
     target: {
       type: DataTypes.STRING,
       allowNull: false,
+      references: {
+        model: Node,  // Reference the Node model
+        key: 'id',    // 'id' field in the Node model
+      },
+      onDelete: 'CASCADE', // Optional: delete edges when the associated node is deleted
     },
   },
   {
@@ -31,5 +41,9 @@ Edge.init(
     timestamps: false, 
   }
 );
+
+// Ensure relationships are set up in Sequelize
+Edge.belongsTo(Node, { foreignKey: 'source', as: 'SourceNode' });
+Edge.belongsTo(Node, { foreignKey: 'target', as: 'TargetNode' });
 
 export default Edge;
