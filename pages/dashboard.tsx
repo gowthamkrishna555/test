@@ -8,8 +8,8 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Box, Button, Container, Paper, Typography, TextField } from "@mui/material";
-import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
+import { fetchNodes, addNode as apiAddNode, deleteNode as apiDeleteNode, updateNodeLabel as apiUpdateNodeLabel, fetchEdges, addEdge } from "../api-spec/node-edgeService";
 
 
 interface CustomEdge {
@@ -24,18 +24,14 @@ export default function Dashboard() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [nodeLabel, setNodeLabel] = useState<string>("");
 
-  
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [nodeRes, edgeRes] = await Promise.all([
-          axios.get<any[]>("/api/node"),
-          axios.get<any[]>("/api/edge"),
-        ]);
+        const nodeRes = await fetchNodes();
+        const edgeRes = await fetchEdges();
 
-        
         setNodes(
-          nodeRes.data.map((node: any) => ({
+          nodeRes.map((node: any) => ({
             id: node.id.toString(),
             data: { label: node.label },
             position: { x: node.position_x, y: node.position_y },
@@ -44,7 +40,7 @@ export default function Dashboard() {
         );
 
         setEdges(
-          edgeRes.data.map((edge: any) => ({
+          edgeRes.map((edge: any) => ({
             id: edge.id.toString(),
             source: edge.source.toString(),
             target: edge.target.toString(),
@@ -55,10 +51,9 @@ export default function Dashboard() {
       }
     };
     fetchData();
-  }, []);  
+  }, []);
 
-  const addNode = async () => {
-    
+  const handleAddNode = async () => {
     const newNode = {
       id: uuidv4(),
       label: `Node ${nodes.length + 1}`,
@@ -68,103 +63,75 @@ export default function Dashboard() {
     };
 
     if (selectedNodeId) {
-      
       const parentNode = nodes.find((node) => node.id === selectedNodeId);
-
       if (parentNode) {
         const newPositionY = parentNode.position.y + 100;
 
-        setNodes((prev) => [
-          ...prev,
-          {
-            id: newNode.id,
-            data: { label: newNode.label },
-            position: { x: parentNode.position.x + 200, y: newPositionY },
-            style: { backgroundColor: newNode.color, borderRadius: "5px", padding: "10px" },
-          },
-        ]);
+        setNodes((prev) => [...prev, {
+          id: newNode.id,
+          data: { label: newNode.label },
+          position: { x: parentNode.position.x + 200, y: newPositionY },
+          style: { backgroundColor: newNode.color, borderRadius: "5px", padding: "10px" },
+        }]);
 
-        setEdges((prev) => [
-          ...prev,
-          {
-            id: `${selectedNodeId}-${newNode.id}`,
-            source: selectedNodeId,
-            target: newNode.id,
-          },
-        ]);
+        setEdges((prev) => [...prev, {
+          id: `${selectedNodeId}-${newNode.id}`,
+          source: selectedNodeId,
+          target: newNode.id,
+        }]);
 
-        
         try {
-          await axios.post("/api/node", newNode);
-          await axios.post("/api/edge", {
-            source: selectedNodeId,
-            target: newNode.id,
-          });
+          await apiAddNode(newNode);
+          await addEdge(selectedNodeId, newNode.id); // Fixed issue with 'edgeService'
         } catch (error) {
           console.error("Error adding node:", error);
         }
       }
     } else {
-      // Add the node 
-      setNodes((prev) => [
-        ...prev,
-        {
-          id: newNode.id,
-          data: { label: newNode.label },
-          position: { x: newNode.position_x, y: newNode.position_y },
-          style: { backgroundColor: newNode.color, borderRadius: "5px", padding: "10px" },
-        },
-      ]);
+      setNodes((prev) => [...prev, {
+        id: newNode.id,
+        data: { label: newNode.label },
+        position: { x: newNode.position_x, y: newNode.position_y },
+        style: { backgroundColor: newNode.color, borderRadius: "5px", padding: "10px" },
+      }]);
 
-      
       try {
-        await axios.post("/api/node", newNode);
+        await apiAddNode(newNode);
       } catch (error) {
         console.error("Error adding node:", error);
       }
     }
   };
 
-  // Delete node 
-  const deleteNode = async (id: string) => {
+  const handleDeleteNode = async (id: string) => {
     setNodes((prev) => prev.filter((node) => node.id !== id));
     setEdges((prev) => prev.filter((edge) => edge.source !== id && edge.target !== id));
 
     try {
-      await axios.delete("/api/node", { params: { id } });
-      await axios.delete("/api/edge", { params: { source: id, target: id } });
+      await apiDeleteNode(id);
     } catch (error) {
       console.error("Error deleting node:", error);
     }
   };
 
-  // Mark node as complete (change style)
   const markAsComplete = (id: string) => {
-    setNodes((prev) =>
-      prev.map((node) =>
-        node.id === id
-          ? { ...node, style: { backgroundColor: "lightgreen", border: "2px solid green", borderRadius: "5px" } }
-          : node
-      )
-    );
+    setNodes((prev) => prev.map((node) =>
+      node.id === id ? { ...node, style: { backgroundColor: "lightgreen", border: "2px solid green", borderRadius: "5px" } } : node
+    ));
   };
 
-  // Handle node click (for selecting)
   const onNodeClick = (event: any, node: any) => {
     setSelectedNodeId(node.id);
     setNodeLabel(node.data?.label || "");
   };
 
-  // Update node label
-  const updateNodeLabel = async (id: string) => {
-    setNodes((prev) =>
-      prev.map((node) =>
-        node.id === id ? { ...node, data: { label: nodeLabel } } : node
-      )
-    );
+  const handleUpdateNodeLabel = async (id: string) => {
+    setNodes((prev) => prev.map((node) =>
+      node.id === id ? { ...node, data: { label: nodeLabel } } : node
+    ));
 
     try {
-      await axios.put("/api/node", { id, label: nodeLabel });
+      await apiUpdateNodeLabel(id, nodeLabel); // Fixed function call
     } catch (error) {
       console.error("Error updating node label:", error);
     }
@@ -172,20 +139,18 @@ export default function Dashboard() {
 
   return (
     <Container maxWidth="md">
+      {/* Header with Add Node Button */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mt={3} mb={2}>
         <Typography variant="h4" fontWeight="bold">
           React Flow Dashboard
         </Typography>
-        <Button
-          variant="contained"
-          onClick={addNode}
-          sx={{ backgroundColor: "#1976d2" }}
-        >
+        <Button variant="contained" onClick={handleAddNode} sx={{ bgcolor: "primary.main" }}>
           Add Node (as Root or Child)
         </Button>
       </Box>
-
-      <Paper elevation={3} sx={{ height: "500px", borderRadius: 2, overflow: "hidden" }}>
+  
+      {/* React Flow Diagram */}
+      <Paper elevation={3} sx={{ height: 500, borderRadius: 2, overflow: "hidden" }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -199,38 +164,30 @@ export default function Dashboard() {
           <Controls />
         </ReactFlow>
       </Paper>
-
+  
       {/* Edit Node Label */}
       {selectedNodeId && (
         <Box mt={3}>
-          <TextField
-            label="Edit Node Label"
-            value={nodeLabel}
-            onChange={(e) => setNodeLabel(e.target.value)}
-            fullWidth
-          />
-          <Button
-            variant="contained"
-            sx={{ mt: 2 }}
-            onClick={() => updateNodeLabel(selectedNodeId)}
-          >
+          <TextField label="Edit Node Label" value={nodeLabel} onChange={(e) => setNodeLabel(e.target.value)} fullWidth />
+          <Button variant="contained" sx={{ mt: 2 }} onClick={() => handleUpdateNodeLabel(selectedNodeId)}>
             Update Label
           </Button>
         </Box>
       )}
-
+  
+      {/* List of Nodes */}
       <Box mt={3}>
         {nodes.map((node) => (
           <Box key={node.id} display="flex" alignItems="center" mt={1}>
             <Typography variant="body1" sx={{ minWidth: 80 }}>
-              {node.data?.label || "Unnamed Node"}
+              {node.data.label || "Unnamed Node"}
             </Typography>
-
+  
             {/* Action Buttons */}
-            <Button variant="contained" size="small" color="primary" onClick={() => markAsComplete(node.id)} sx={{ ml: 1 }}>
+            <Button variant="contained" size="small" color="success" onClick={() => markAsComplete(node.id)} sx={{ ml: 1 }}>
               Mark as Complete
             </Button>
-            <Button variant="contained" size="small" color="error" onClick={() => deleteNode(node.id)} sx={{ ml: 1 }}>
+            <Button variant="contained" size="small" color="error" onClick={() => handleDeleteNode(node.id)} sx={{ ml: 1 }}>
               Delete
             </Button>
           </Box>
@@ -238,4 +195,4 @@ export default function Dashboard() {
       </Box>
     </Container>
   );
-}
+}  
