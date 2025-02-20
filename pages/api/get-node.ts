@@ -13,8 +13,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const nodes = await Node.findAll();
     return res.status(200).json(nodes);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching nodes:", error);
-    return res.status(500).json({ error: error.message || "Internal Server Error" });
+  
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+  
+    return res.status(500).json({ error: "Internal Server Error" });
   }
+  
 }

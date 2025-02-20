@@ -32,8 +32,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log("Node updated successfully:", updatedNode);
 
     return res.status(200).json(updatedNode);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating node:", error);
-    return res.status(500).json({ error: error.message || "Internal Server Error" });
+  
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+  
+    return res.status(500).json({ error: "Internal Server Error" });
   }
+  
 }

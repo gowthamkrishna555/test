@@ -40,7 +40,7 @@ export default function Dashboard() {
         );
 
         setEdges(
-          edgeRes.map((edge: any) => ({
+          edgeRes.map((edge: CustomEdge) => ({
             id: edge.id.toString(),
             source: edge.source.toString(),
             target: edge.target.toString(),
