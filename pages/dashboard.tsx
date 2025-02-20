@@ -9,9 +9,16 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { Box, Button, Container, Paper, Typography, TextField } from "@mui/material";
 import { v4 as uuidv4 } from 'uuid';
+import { NodeMouseHandler } from "reactflow";
 import { fetchNodes, addNode as apiAddNode, deleteNode as apiDeleteNode, updateNodeLabel as apiUpdateNodeLabel, fetchEdges, addEdge } from "../api-spec/node-edgeService";
 
-
+interface CustomNode {
+  id: string;
+  label: string;
+  position_x: number;
+  position_y: number;
+  color?: string;
+}
 interface CustomEdge {
   id: string;
   source: string;
@@ -27,20 +34,20 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const nodeRes = await fetchNodes();
-        const edgeRes = await fetchEdges();
-
+        const nodeRes: CustomNode[] = await fetchNodes();
+        const edgeRes: CustomEdge[] = await fetchEdges();
+  
         setNodes(
-          nodeRes.map((node: any) => ({
+          nodeRes.map((node) => ({
             id: node.id.toString(),
             data: { label: node.label },
             position: { x: node.position_x, y: node.position_y },
             style: { backgroundColor: node.color || "#ddd", borderRadius: "5px", padding: "10px" },
           }))
         );
-
+  
         setEdges(
-          edgeRes.map((edge: CustomEdge) => ({
+          edgeRes.map((edge) => ({
             id: edge.id.toString(),
             source: edge.source.toString(),
             target: edge.target.toString(),
@@ -52,7 +59,6 @@ export default function Dashboard() {
     };
     fetchData();
   }, []);
-
   const handleAddNode = async () => {
     const newNode = {
       id: uuidv4(),
@@ -120,11 +126,11 @@ export default function Dashboard() {
     ));
   };
 
-  const onNodeClick = (event: any, node: any) => {
+  const onNodeClick: NodeMouseHandler = (event, node) => {
     setSelectedNodeId(node.id);
-    setNodeLabel(node.data?.label || "");
+    setNodeLabel(node.data?.label || ""); // Access label correctly
   };
-
+  
   const handleUpdateNodeLabel = async (id: string) => {
     setNodes((prev) => prev.map((node) =>
       node.id === id ? { ...node, data: { label: nodeLabel } } : node
