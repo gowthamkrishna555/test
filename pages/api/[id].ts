@@ -1,4 +1,3 @@
-import { Node } from 'reactflow';
 import { NextApiRequest, NextApiResponse } from "next";
 import NodeModel from "../../models/Node";
 import db from "../../lib/db"; 

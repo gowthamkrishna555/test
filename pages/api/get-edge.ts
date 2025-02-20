@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Edge from "../../models/Edge";
-import Node from "../../models/Node";
 import { connectDB } from "../../lib/sequelize";
 
 
