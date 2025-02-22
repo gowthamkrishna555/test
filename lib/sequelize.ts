@@ -1,31 +1,27 @@
 import { Sequelize } from "sequelize";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("❌ DATABASE_URL is not defined in environment variables");
-}
-
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: "postgres",
-  dialectOptions: {
-    ssl: {
-      require: true, // Fix here: No `require` function, just `true`
-      rejectUnauthorized: false, // Required for NeonDB
-    },
-  },
-  logging: process.env.NODE_ENV === "development", // Log queries only in dev mode
-});
+const sequelize = new Sequelize(
+  "reactflow_db", // Database name
+  "nextjs_user",  // Database user
+  "Password@123", // Database password
+  {
+    host: "localhost", // Change if your database is on another server
+    dialect: "postgres", // Specify PostgreSQL
+    logging: true, // Set to true for debugging queries
+  }
+);
 
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync();
-    console.log("✅ PostgreSQL connected successfully!");
+    await sequelize.sync(); 
+    console.log(" PostgreSQL connected successfully!");
   } catch (error) {
-    console.error("❌ PostgreSQL connection failed:", error);
+    console.error(" PostgreSQL connection failed:", error);
     process.exit(1);
   }
 };
 
-connectDB();
+connectDB(); 
 
-export { sequelize };
+export { sequelize }; 
