@@ -1,30 +1,27 @@
 import { Sequelize } from "sequelize";
-import dotenv from "dotenv";
 
-dotenv.config(); 
-
-const sequelize = new Sequelize(process.env.DATABASE_URL as string, {
-  dialect: "postgres",
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
-  },
-  logging: true, 
-});
+const sequelize = new Sequelize(
+  "reactflow_db", // Database name
+  "nextjs_user",  // Database user
+  "Password@123", // Database password
+  {
+    host: "localhost", // Change if your database is on another server
+    dialect: "postgres", // Specify PostgreSQL
+    logging: true, // Set to true for debugging queries
+  }
+);
 
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync();
-    console.log("✅ PostgreSQL connected successfully!");
+    await sequelize.sync(); 
+    console.log(" PostgreSQL connected successfully!");
   } catch (error) {
-    console.error("❌ PostgreSQL connection failed:", error);
+    console.error(" PostgreSQL connection failed:", error);
     process.exit(1);
   }
 };
 
-connectDB();
+connectDB(); 
 
-export { sequelize };
+export { sequelize }; 
