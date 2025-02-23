@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 
-dotenv.config(); // Load environment variables
+dotenv.config(); 
 
 const sequelize = new Sequelize(process.env.DATABASE_URL as string, {
   dialect: "postgres",
@@ -11,13 +11,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL as string, {
       rejectUnauthorized: false,
     },
   },
-  pool: {
-    max: 5, // Max 5 connections (important for serverless)
-    min: 0,
-    acquire: 30000,
-    idle: 10000,
-  },
-  logging: false, // Change to `true` for debugging
+  logging: true, 
 });
 
 export const connectDB = async () => {
@@ -31,9 +25,6 @@ export const connectDB = async () => {
   }
 };
 
-// Connect to DB only once in production
-if (process.env.NODE_ENV !== "production") {
-  connectDB();
-}
+connectDB();
 
 export { sequelize };
