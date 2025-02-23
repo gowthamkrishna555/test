@@ -1,9 +1,15 @@
 import { Sequelize } from "sequelize";
 
-const sequelize = new Sequelize("reactflow_db", "nextjs_user", "Password@123", {
-  host: "localhost",
+// Use environment variable for security
+const sequelize = new Sequelize(process.env.DATABASE_URL as string, {
   dialect: "postgres",
-  logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true, // Required for NeonDB
+      rejectUnauthorized: false, // Bypass self-signed SSL issues
+    },
+  },
+  logging: console.log, // Enable logging to debug SQL queries
 });
 
 export default sequelize;
