@@ -1,11 +1,11 @@
 import { Sequelize } from "sequelize";
 
 const sequelize = new Sequelize(
-  "reactflow_db", // Database name
-  "nextjs_user",  // Database user
-  "Password@123", // Database password
+  "neondb", // Database name
+  "neondb_owner",  // Database user
+  "npg_H5BKa6EwhvFl", // Database password
   {
-    host: "localhost", // Change if your database is on another server
+    host: "ep-purple-wildflower-a1gtfkf9-pooler.ap-southeast-1.aws.neon.tech", // Change if your database is on another server
     dialect: "postgres", // Specify PostgreSQL
     logging: true, // Set to true for debugging queries
   }
