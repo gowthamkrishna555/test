@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+import pg from 'pg';
 
 const sequelize = new Sequelize(
   "neondb", // Database name
@@ -7,7 +8,8 @@ const sequelize = new Sequelize(
   {
     host: "ep-purple-wildflower-a1gtfkf9-pooler.ap-southeast-1.aws.neon.tech", // Change if your database is on another server
     dialect: "postgres", // Specify PostgreSQL
-    logging: true, // Set to true for debugging queries
+    dialectModule: pg,
+    logging: true // Set to true for debugging queries
   }
 );
 
