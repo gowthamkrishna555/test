@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "neondb_owner",
+    "password": "npg_H5BKa6EwhvFl",
+    "database": "neondb",
+    "host": "ep-purple-wildflower-a1gtfkf9-pooler.ap-southeast-1.aws.neon.tech",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "neondb_owner",
+    "password": "npg_H5BKa6EwhvFl",
+    "database": "neondb",
+    "host": "ep-purple-wildflower-a1gtfkf9-pooler.ap-southeast-1.aws.neon.tech",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "neondb_owner",
+    "password": "npg_H5BKa6EwhvFl",
+    "database": "neondb",
+    "host": "ep-purple-wildflower-a1gtfkf9-pooler.ap-southeast-1.aws.neon.tech",
+    "dialect": "postgres"
+  }
+}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { DoubleDataType } from "sequelize";
 
 export const fetchNodes = async () => {
   try {
@@ -26,9 +27,9 @@ export const deleteNode = async (id: string) => {
   }
 };
 
-export const updateNodeLabel = async (id: string, label: string) => {
+export const updateNodeLabel = async (id: string, label: string, color:string) => {
   try {
-    await axios.put("/api/update-node", { id, label });
+    await axios.put("/api/update-node", { id, label,color });
   } catch (error) {
     console.error("Error updating node label:", error);
   }
@@ -52,6 +53,16 @@ export const fetchEdges = async () => {
       console.error("Error adding edge:", error);
     }
   };
+  export const apiUpdateNodePosition = async (id: string, x: number, y: number) => {
+    try {
+      const response = await axios.put(`/api/position`, { id, position_x: x, position_y: y });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating node position:", error);
+      throw error;
+    }
+  };
+  
   
   // export const deleteEdge = async (source: string, target: string) => {
   //   try {
